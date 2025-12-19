@@ -1,38 +1,37 @@
-# SmartView
-# Distributed Media Association - Data Analysis Project
+# SmartView - Distributed Media Analytics Engine
 
-This project is a big data analysis pipeline built using **PySpark**. It processes large-scale viewing and demographic data for the "Distributed Media Association" to analyze viewer behavior and improve service quality.
+![Spark](https://img.shields.io/badge/Apache%20Spark-3.0%2B-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Databricks](https://img.shields.io/badge/Databricks-Platform-FF3621?style=for-the-badge&logo=databricks&logoColor=white)
 
-## 📌 Project Overview
-The goal of this project is to process and analyze distributed data across multiple datasets to derive insights into household viewing habits, program popularity, and demographic trends.
+## Summary
+This project implements a scalable **Big Data ETL & Analytics Pipeline** designed to process high-volume viewing logs and demographic data for the "Distributed Media Association."
 
-**Key Technologies:** Apache Spark (PySpark), Spark SQL, Databricks.
+The solution leverages **PySpark** to ingest, clean, and analyze distributed datasets, deriving actionable business insights such as **Household Wealth Scores**, **Program Popularity Indices**, and **Genre Preferences** across different market areas (DMAs). The architecture focuses on performance optimization using Spark SQL best practices to handle millions of records efficiently.
 
-## 📂 Dataset Description
-The analysis relies on four interconnected datasets:
-1.  **Reference Data:** Maps device IDs to specific households and Market Areas (DMA).
-2.  **Daily Program Data:** Metadata for programs (Program Code, Title, Genre, Air Date/Time, Duration).
-3.  **Program Viewing Data:** High-volume log data recording when specific devices viewed specific programs.
-4.  **Demographic Data:** Household details including income, size, and other socioeconomic factors.
+## System Architecture
+The pipeline is modularized into two distinct stages to separate data engineering from business intelligence.
 
-## 🚀 Notebook Structure
+### Part 1: Robust ETL Pipeline 
+Responsible for ingesting raw data and preparing a clean, type-safe foundation for analysis.
+* **Schema Enforcement:** utilization of strict `StructTypes` to validate data quality at ingestion for Reference, Program, and Viewing logs.
+* **Data Sanitization:** * Resolution of "clashing records" (conflicting metadata for identical program codes).
+    * Deduplication strategies to ensure data integrity.
+* **Feature Engineering:** Transformation of categorical socioeconomic indicators (e.g., mapping Income Codes 'A'-'D' to ordinal numeric scales 10-13) to facilitate downstream mathematical modeling.
 
-### 1. Data Loading & Cleaning (`notebooks/Part1...`)
-* **Schema Definition:** Defines strict StructTypes for efficient data loading.
-* **Data Ingestion:** Loads CSV data from the distributed file system (DBFS).
-* **Preprocessing:** * Casts encoded columns (e.g., Income codes 'A'-'D') to integers.
-    * Handles "clashing" records (e.g., inconsistent genres for the same program code).
-    * Removes duplicates and performs validity checks.
+### Part 2: Advanced Market Analytics 
+Focuses on deriving complex metrics using advanced Spark capabilities.
+* **Behavioral Segmentation:** Development of a **"Wealth Score" algorithm**, correlating household income data with viewing duration to grade market potential.
+* **Window Functions:** Extensive use of `Window.partitionBy()` and `rank()` to calculate granular statistics (e.g., *Top 5 Genres per DMA*) without expensive shuffling.
+* **Performance Optimization:** Implementation of **Broadcast Joins** for combining large transaction logs with smaller dimension tables (Demographics/Programs), significantly reducing network overhead.
 
-### 2. Analysis & Transformation (`notebooks/Part2...`)
-* **Advanced Aggregations:** joins viewing logs with demographic and program data.
-* **Business Logic:** Calculates metrics such as "Wealth Score" per DMA and analyzes genre preferences.
-* **Optimization:** Utilizes Spark Window functions and broadcasting for efficient join operations on large datasets.
+## 📂 Repository Structure
 
-## 🛠️ How to Run
-1.  **Environment:** This project is designed to run on a Spark cluster (e.g., Databricks or local Spark setup).
-2.  **Data Setup:** Ensure the CSV files are mounted to `dbfs:/mnt/coursedata2024/fwm-stb-data/` (or update the file paths in the `load_csv_file` function).
-3.  **Execution:** Run the notebooks in order (Part 1 first to validate data, then Part 2).
-
-## 📝 Course Context
-This project was created for the **Distributed Database Management (096224)** course at the **Technion - Israel Institute of Technology**.
+```text
+├── notebooks/
+│   ├── SmartView - SparkML Analysis and Metrics.ipynb           # Ingestion, Schema Validation, Cleaning
+│   └── SmartView - ETL and Data Cleaning.ipynb    # Wealth Scoring, Aggregations, Reporting
+├── data/
+│   └── .gitkeep                    # (Data excluded: Hosted on Distributed File System)
+├── .gitignore                      # Configured to ignore large CSV/Parquet files
+└── README.md                       # Project Documentation
